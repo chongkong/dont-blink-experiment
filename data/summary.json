@@ -1,0 +1,18 @@
+{
+  "docs": [
+    {
+      "id": "",
+      "content": "",
+      "duration": 30.4,
+      "sync": [],
+      "questions": [
+        {
+          "statement": "Which is correct?",
+          "choices_csv": "A,B,C",
+          "answer": "A"
+        }
+      ]
+    }
+  ],
+  "audios": ["sample.mp3"]
+}

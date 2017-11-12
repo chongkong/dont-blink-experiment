@@ -1,45 +1,123 @@
-from typing import NamedTuple, List
+import typing
 
 
-class Participant(NamedTuple):
-    id: int
+ID_TYPE = str
+
+
+def _create_dict_property(key):
+    def key_get(self):
+        return self[key]
+
+    def key_set(self, val):
+        self[key] = val
+
+    def key_del(self):
+        self.pop(key)
+
+    return property(key_get, key_set, key_del)
+
+
+class _DictModel(type):
+    def __new__(mcs, name, bases, attrs):
+        assert dict in bases
+        model = super().__new__(mcs, name, bases, attrs)
+        for key in attrs["__annotations__"].keys():
+            setattr(model, key, _create_dict_property(key))
+        return model
+
+
+class Participant(dict, metaclass=_DictModel):
+    id: ID_TYPE
+    experiment_id: ID_TYPE
     name: str
     age: int
     gender: str
     department: str
     contact: str
 
+    def __init__(self, **kwargs):
+        super(Participant, self).__init__(**kwargs)
 
-class Question(NamedTuple):
-    problem: str
-    candidates: List[str]
+    @classmethod
+    def from_dict(cls, dic):
+        return cls(**dic)
+
+
+class Question(dict, metaclass=_DictModel):
+    statement: str
+    choices: typing.List[str]
     answer: str
 
+    def __init__(self, **kwargs):
+        super(Question, self).__init__(**kwargs)
 
-class Document(NamedTuple):
-    id: int
+    @classmethod
+    def from_dict(cls, dic):
+        return cls(**dic)
+
+
+class Document(dict, metaclass=_DictModel):
+    id: ID_TYPE
     content: str
-    audio_file: str
     duration: float
-    sync: List[float]
-    questions: List[Question]
+    sync: typing.List[float]
+    questions: typing.List[Question]
+
+    def __init__(self, **kwargs):
+        super(Document, self).__init__(**kwargs)
+
+    @classmethod
+    def from_dict(cls, dic):
+        questions = dic.pop("questions")
+        obj = cls(**dic)
+        obj.questions = [Question.from_dict(d) for d in questions]
+        return obj
 
 
-class Answer(NamedTuple):
+class Answer(dict, metaclass=_DictModel):
     choice: str
     correct: bool
     response_time: float
 
+    def __init__(self, **kwargs):
+        super(Answer, self).__init__(**kwargs)
 
-class Section(NamedTuple):
-    doc_id: int
-    participant_id: int
+    @classmethod
+    def from_dict(cls, dic):
+        return cls(**dic)
+
+
+class Section(dict, metaclass=_DictModel):
+    doc_id: ID_TYPE
     disp_type: str
-    answers: List[Answer]
+    audio_file: str
+    answers: typing.List[Answer]
     completed: bool
     completed_at: str
 
+    def __init__(self, **kwargs):
+        super(Section, self).__init__(**kwargs)
 
-class Experiment(NamedTuple):
-    sections: List[Section]
+    @classmethod
+    def from_dict(cls, dic):
+        answers = dic.pop("answers")
+        obj = cls(**dic)
+        obj.answers = [Answer.from_dict(d) for d in answers]
+        return obj
+
+
+class Experiment(dict, metaclass=_DictModel):
+    id: ID_TYPE
+    participant_id: ID_TYPE
+    sections: typing.List[Section]
     started_at: str
+
+    def __init__(self, **kwargs):
+        super(Experiment, self).__init__(**kwargs)
+
+    @classmethod
+    def from_dict(cls, dic):
+        sections = dic.pop("sections")
+        obj = cls(**dic)
+        obj.sections = [Section.from_dict(d) for d in sections]
+        return obj
