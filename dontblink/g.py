@@ -20,4 +20,4 @@ with open("data/summary.json", "r") as f:
     _data = json.load(f)
 docs: typing.Dict[str, model.Document] = \
     {doc["id"]: model.Document.from_dict(doc) for doc in _data["docs"]}
-audios: _data["audios"]
+audios = _data["audios"]

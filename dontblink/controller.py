@@ -1,8 +1,19 @@
+import json
 import random
+
+import flask
 
 import dontblink.model as model
 import dontblink.g as g
 import dontblink.util as util
+
+
+def assert_experiment(exp_id):
+    if "user" not in flask.session:
+        flask.abort(403)
+    user = model.Participant.from_dict(json.loads(flask.session["user"]))
+    if user.experiment_id != exp_id:
+        flask.abort(403)
 
 
 def _compose_sections():
@@ -10,8 +21,9 @@ def _compose_sections():
     combs = [("text", False), ("text", True), ("dontblink", False), ("dontblink", True)]
     # random.shuffle(combs)
     sections = []
+    audios = random.sample(g.audios, 2)
     for i, (disp_type, use_audio) in enumerate(combs):
-        audio_file = None if use_audio else random.choice(list(g.audios.values()))
+        audio_file = None if use_audio else audios.pop()
         sections.append(model.Section(doc_id=doc_ids[i], disp_type=disp_type, answers=[],
                                       audio_file=audio_file, completed=False,
                                       completed_at=None))
@@ -19,15 +31,15 @@ def _compose_sections():
 
 
 def register_participant(name, age, gender, department, contact):
-    parti = model.Participant(id=util.random_string(12), name=name, age=age,
-                              gender=gender, department=department, contact=contact)
+    user = model.Participant(id=util.random_string(12), name=name, age=age,
+                             gender=gender, department=department, contact=contact)
     exp = model.Experiment(id=util.random_string(12), sections=_compose_sections(),
                            started_at=util.now())
-    parti.experiment_id = exp.id
-    exp.participant_id = parti.id
+    user.experiment_id = exp.id
+    exp.participant_id = user.id
     g.db.child("Experiments").child(exp.id).set(exp)
-    g.db.child("Participants").child(parti.id).set(parti)
-    return parti
+    g.db.child("Participants").child(user.id).set(user)
+    return user
 
 
 def _remove_answer(doc: dict):

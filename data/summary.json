@@ -14,5 +14,5 @@
       ]
     }
   ],
-  "audios": ["sample.mp3"]
+  "audios": ["talk.mp3", "radio.mp3"]
 }
