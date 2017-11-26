@@ -1,5 +1,4 @@
 firebase-adminsdk-*.json
-config.py
 
 *.pyc
 .DS_Store

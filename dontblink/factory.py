@@ -6,11 +6,12 @@ import pyrebase
 import dontblink.model as model
 import dontblink.controller as ctrl
 import dontblink.api as api
+import dontblink.config as config
 
 
 def create_app():
     app = flask.Flask(__name__)
-    app.config.from_envvar("CONFIG_FILE")
+    config.load_config_from_env(app)
 
     firebase = pyrebase.initialize_app({
         "apiKey": app.config["FIREBASE_API_KEY"],

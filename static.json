@@ -1,0 +1,6 @@
+{
+  "routes": {
+    "/dist/build.js": "dist/build.js",
+    "/": "index.html",
+  }
+}
