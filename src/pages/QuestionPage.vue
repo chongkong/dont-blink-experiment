@@ -1,0 +1,116 @@
+<template>
+  <v-flex class="question-page" md6 offset-md3>
+    <h2>{{statement}}</h2>
+    <ul>
+      <li v-for="(choice, i) in choices" :key="choice">
+        <kbd :class="{'blue': selected == i}">{{i + 1}}</kbd>
+        {{choice}}
+      </li>
+    </ul>
+  </v-flex>
+</template>
+
+<script>
+import store from "../store";
+import util from "../util";
+
+export default {
+  beforeRouteEnter(curr, prev, next) {
+    let {sid, qid} = curr.params;
+    store.dispatch("loadExperiment").then(exp => {
+      let question = exp.sections[sid - 1].doc.questions[qid - 1];
+      next(vm => vm.setQuestion(question));
+    })
+  },
+
+  beforeRouteUpdate(curr, prev, next) {
+    this.selected = -1;
+    let {sid, qid} = curr.params;
+    store.dispatch("loadExperiment").then(exp => {
+      let question = exp.sections[sid - 1].doc.questions[qid - 1];
+      this.setQuestion(question);
+      next();
+    });
+  },
+
+  created() {
+    this.askedAt = Date.now();
+    this.keyEventListener = window.addEventListener("keydown", (event) => {
+      if (event.isTrusted && event.key.match(/[1-9]/))
+        this.recordAndProceed(event.key - 1);
+    });
+  },
+
+  destroyed() {
+    window.removeEventListener(this.keyEventListener, window);
+  },
+
+  data() {
+    return {
+      selected: -1,
+      askedAt: 0,
+      statement: "",
+      choices: [],
+      keyEventListener: null
+    }
+  },
+
+  methods: {
+    setQuestion(question) {
+      this.statement = question.statement;
+      this.choices = question.choices;
+    },
+    recordAndProceed(choice) {
+      const WAIT_MILLIS = 2000;
+      if (this.selected != -1)
+        return;
+
+      let answeredAt = Date.now();
+      this.selected = choice;
+      let responseTime = answeredAt - this.askedAt;
+      console.log(responseTime, answeredAt, this.askedAt)
+      let sid = this.$route.params.sid - 0;
+      let qid = this.$route.params.qid - 0;
+      this.$store.dispatch("recordAnswer", {sid, qid, choice, responseTime}).then(() => {
+        let timeLeft = Math.max(0, WAIT_MILLIS - (Date.now() - answeredAt));
+        return util.waitForMillis(timeLeft);
+      }).then(() => {
+        let sec = this.$store.state.experiment.sections[sid - 1];
+        if (sec.answers.length < sec.doc.questions.length)
+          this.$router.push({name: "question", params: {sid, qid: qid + 1}});
+        else if (sid < this.$store.getters.numSections)
+          this.$router.push({name: "prepare", params: {sid: sid + 1}});
+        else
+          this.$router.push({name: "thankyou"});
+      });
+    },
+    getColor(choiceIndex) {
+      return this.selected == choiceIndex ? "primary" : "";
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+.question-page {
+  h2 {
+    margin: 40px 0;
+    padding: 0 20px;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+  }
+
+  li {
+    display: inline-block;
+    margin: 0 20px;
+  }
+
+  li {
+    font-size: 20px;
+  }
+}
+</style>
