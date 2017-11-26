@@ -2,8 +2,6 @@ import json
 
 import flask
 
-import dontblink.controller as ctrl
-
 bp = flask.Blueprint("api", __name__, url_prefix="/api")
 
 
@@ -19,34 +17,34 @@ def register_participant():
     except KeyError:
         return flask.abort(401)
 
-    user = ctrl.register_participant(name, age, gender, department, contact)
-    flask.session["user"] = json.dumps(user)
-    return flask.jsonify(user)
+    participant = flask.g.ctrl.register_participant(name, age, gender, department, contact)
+    return flask.jsonify(participant)
 
 
-@bp.route("/experiments/<int:exp_id>")
-def get_experiment(exp_id):
-    ctrl.assert_experiment(exp_id)
-    return flask.jsonify(ctrl.get_experiment(exp_id))
+@bp.route("/experiment")
+def get_experiment():
+    participant = flask.g.ctrl.load_session()
+    return flask.jsonify(flask.g.ctrl.get_experiment(participant.experiment_id))
 
 
-@bp.route("/experiments/<int:exp_id>/<int:sec_idx>/<int:ans_idx>")
-def record_answer(exp_id, sec_idx, ans_idx):
-    ctrl.assert_experiment(exp_id)
+@bp.route("/experiment/<int:sec_idx>/<int:ans_idx>", methods=["POST"])
+def record_answer(sec_idx, ans_idx):
+    participant = flask.g.ctrl.load_session()
     try:
         args = flask.request.get_json()
-        choice = args["choice"]
-        rt = args["rt"]
+        choice = int(args["choice"])
+        rt = args["responseTime"]
     except KeyError:
         return flask.abort(401)
 
-    record_answer(exp_id, sec_idx, ans_idx, choice, rt)
+    flask.g.ctrl.record_answer(participant.experiment_id, sec_idx, ans_idx, choice, rt)
     return "", 204
 
 
-@bp.route("/data/<path:path>")
-def get_file(path):
-    pass  # flask.send_from_directory("")
+@bp.route("/logout", methods=["POST"])
+def logout():
+    flask.g.ctrl.logout()
+    return "", 204
 
 
 @bp.route("/login")

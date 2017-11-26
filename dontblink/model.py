@@ -46,7 +46,7 @@ class Participant(dict, metaclass=_DictModel):
 class Question(dict, metaclass=_DictModel):
     statement: str
     choices: typing.List[str]
-    answer: str
+    answer: int
 
     def __init__(self, **kwargs):
         super(Question, self).__init__(**kwargs)
@@ -68,7 +68,7 @@ class Document(dict, metaclass=_DictModel):
 
     @classmethod
     def from_dict(cls, dic):
-        questions = dic.pop("questions")
+        questions = dic["questions"]
         obj = cls(**dic)
         obj.questions = [Question.from_dict(d) for d in questions]
         return obj
@@ -100,7 +100,7 @@ class Section(dict, metaclass=_DictModel):
 
     @classmethod
     def from_dict(cls, dic):
-        answers = dic.pop("answers")
+        answers = dic.get("answers", [])
         obj = cls(**dic)
         obj.answers = [Answer.from_dict(d) for d in answers]
         return obj
@@ -117,7 +117,7 @@ class Experiment(dict, metaclass=_DictModel):
 
     @classmethod
     def from_dict(cls, dic):
-        sections = dic.pop("sections")
+        sections = dic["sections"]
         obj = cls(**dic)
         obj.sections = [Section.from_dict(d) for d in sections]
         return obj
