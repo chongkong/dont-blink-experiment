@@ -8,10 +8,25 @@
 
 <script>
 import axios from "axios";
+import {keyEvent} from "../events";
 
 export default {
   beforeRouteEnter(routeTo, routeFrom, next) {
     axios.post("/api/logout").then(() => next());
+  },
+
+  created() {
+    keyEvent.$on("space", this.goToIntro);
+  },
+
+  beforeDestroy() {
+    keyEvent.$off("space", this.goToIntro);
+  },
+
+  methods: {
+    goToIntro() {
+      this.$router.push({name: "intro"});
+    }
   }
 }
 </script>

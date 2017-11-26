@@ -11,16 +11,15 @@
 </template>
 
 <script>
+import {keyEvent} from "../events";
+
 export default {
   created() {
-    this.keyEventListener = window.addEventListener("keydown", (event) => {
-      if (event.isTrusted && event.code === "Space")
-        this.proceed();
-    });
+    keyEvent.$on("space", this.proceed);
   },
 
-  destroyed() {
-    window.removeEventListener(this.keyEventListener, window);
+  beforeDestroy() {
+    keyEvent.$off("space", this.proceed);
   },
 
   data() {

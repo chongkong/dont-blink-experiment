@@ -13,6 +13,7 @@
 <script>
 import store from "../store";
 import util from "../util";
+import {keyEvent} from "../events";
 
 export default {
   beforeRouteEnter(curr, prev, next) {
@@ -35,14 +36,11 @@ export default {
 
   created() {
     this.askedAt = Date.now();
-    this.keyEventListener = window.addEventListener("keydown", (event) => {
-      if (event.isTrusted && event.key.match(/[1-9]/))
-        this.recordAndProceed(event.key - 1);
-    });
+    keyEvent.$on("digit", this.recordAndProceed);
   },
 
-  destroyed() {
-    window.removeEventListener(this.keyEventListener, window);
+  beforeDestroy() {
+    keyEvent.$off("digit", this.recordAndProceed);
   },
 
   data() {
@@ -62,13 +60,12 @@ export default {
     },
     recordAndProceed(choice) {
       const WAIT_MILLIS = 2000;
-      if (this.selected != -1)
+      if (this.selected !== -1)
         return;
 
       let answeredAt = Date.now();
-      this.selected = choice;
+      this.selected = choice - 1;
       let responseTime = answeredAt - this.askedAt;
-      console.log(responseTime, answeredAt, this.askedAt)
       let sid = this.$route.params.sid - 0;
       let qid = this.$route.params.qid - 0;
       this.$store.dispatch("recordAnswer", {sid, qid, choice, responseTime}).then(() => {
@@ -85,7 +82,7 @@ export default {
       });
     },
     getColor(choiceIndex) {
-      return this.selected == choiceIndex ? "primary" : "";
+      return this.selected === choiceIndex ? "primary" : "";
     }
   }
 }
