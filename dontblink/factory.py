@@ -1,6 +1,7 @@
 import json
 
 import flask
+import whitenoise as wn
 import pyrebase
 
 import dontblink.model as model
@@ -12,6 +13,11 @@ import dontblink.config as config
 def create_app():
     app = flask.Flask(__name__)
     config.load_config_from_env(app)
+
+    whitenoise = wn.WhiteNoise(app.wsgi_app)
+    whitenoise.files["/"] = whitenoise.get_static_file("index.html", "/")
+    whitenoise.add_files("dist", "/dist")
+    app.wsgi_app = whitenoise
 
     firebase = pyrebase.initialize_app({
         "apiKey": app.config["FIREBASE_API_KEY"],

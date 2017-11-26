@@ -17,4 +17,4 @@ def load_config_from_env(app):
         "GCS_BUCKET_PREFIX",
     ]
     for key in keys:
-        app.config.setdefault(key, os.environ.get(key))
+        app.config[key] = os.environ.get(key)
