@@ -22,7 +22,7 @@
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-btn flat @click="register">실험 참가하기</v-btn>
+        <v-btn flat @click="register" :disabled="submitted">실험 참가하기</v-btn>
       </v-card-actions>
     </v-card>
   </v-flex>
@@ -34,6 +34,7 @@ export default {
   data() {
     return {
       valid: false,
+      submitted: false,
       genders: ["U", "F", "M"],
       nameRules: [
         (v) => !!v || "이름을 입력해주세요",
@@ -62,6 +63,7 @@ export default {
   methods: {
     register() {
       if (this.$refs.form.validate()) {
+        this.submitted = true;
         this.$store.dispatch("register", this.participant);
       }
     }

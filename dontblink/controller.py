@@ -32,9 +32,19 @@ class Controller(object):
         return f"https://storage.googleapis.com/{self.gcs_bucket}" \
                f"/{self.gcs_bucket_prefix}{filename}"
 
+    @staticmethod
+    def _generate_combs(k):
+        pops = [("full", False), ("full", True), ("blink", False), ("blink", True)]
+        combs = []
+        while k >= 4:
+            combs += random.sample(pops, 4)
+            k -= 4
+        combs += random.sample(pops, k)
+        return combs
+
     def _compose_sections(self):
-        doc_ids = random.sample(list(self.docs.keys()), k=4)
-        combs = [("full", False), ("full", True), ("blink", False), ("blink", True)]
+        doc_ids = random.sample(list(self.docs.keys()), k=len(self.docs))
+        combs = self._generate_combs(len(self.docs))
         sections = []
         audios = random.sample(self.audios, len([_ for _, use_audio in combs if use_audio]))
         for i, (disp_type, use_audio) in enumerate(combs):

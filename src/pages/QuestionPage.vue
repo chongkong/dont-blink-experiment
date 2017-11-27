@@ -1,12 +1,14 @@
 <template>
   <v-flex class="question-page" md6 offset-md3>
     <h2>{{statement}}</h2>
-    <ul>
-      <li v-for="(choice, i) in choices" :key="choice">
-        <kbd :class="{'blue': selected == i}">{{i + 1}}</kbd>
-        {{choice}}
-      </li>
-    </ul>
+    <div class="ul-wrapper">
+      <ul>
+        <li v-for="(choice, i) in choices" :key="choice">
+          <kbd :class="{'blue': selected == i}">{{i + 1}}</kbd>
+          {{choice}}
+        </li>
+      </ul>
+    </div>
   </v-flex>
 </template>
 
@@ -35,7 +37,6 @@ export default {
   },
 
   created() {
-    this.askedAt = Date.now();
     keyEvent.$on("digit", this.recordAndProceed);
   },
 
@@ -55,6 +56,7 @@ export default {
 
   methods: {
     setQuestion(question) {
+      this.askedAt = Date.now();
       this.statement = question.statement;
       this.choices = question.choices;
     },
@@ -95,19 +97,21 @@ export default {
     padding: 0 20px;
   }
 
-  ul {
-    list-style-type: none;
-    padding: 0;
+  .ul-wrapper {
     text-align: center;
-  }
 
-  li {
-    display: inline-block;
-    margin: 0 20px;
-  }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      display: inline-block;
+      text-align: left;
 
-  li {
-    font-size: 20px;
+      li {
+        display: inline-block;
+        margin: 0 20px;
+        font-size: 20px;
+      }
+    }
   }
 }
 </style>
