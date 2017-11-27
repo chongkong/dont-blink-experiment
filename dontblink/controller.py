@@ -48,7 +48,7 @@ class Controller(object):
         sections = []
         audios = random.sample(self.audios, len([_ for _, use_audio in combs if use_audio]))
         for i, (disp_type, use_audio) in enumerate(combs):
-            audio_file = None if use_audio else self._get_gcs_filename(audios.pop())
+            audio_file = None if not use_audio else self._get_gcs_filename(audios.pop())
             sections.append(model.Section(doc_id=doc_ids[i], disp_type=disp_type,
                                           answers=[], audio_file=audio_file,
                                           completed=False, completed_at=None))
