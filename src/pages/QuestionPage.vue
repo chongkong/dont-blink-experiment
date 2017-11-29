@@ -4,10 +4,13 @@
     <div class="ul-wrapper">
       <ul>
         <li v-for="(choice, i) in choices" :key="choice">
-          <kbd :class="{'blue': selected == i}">{{i + 1}}</kbd>
+          <kbd :class="{'blue': selected === i}">{{i + 1}}</kbd>
           {{choice}}
         </li>
       </ul>
+    </div>
+    <div class="giveup">
+      <kbd :class="{'blue': selected === -1}"></kbd>모르겠어요 😢😢
     </div>
   </v-flex>
 </template>
@@ -27,7 +30,7 @@ export default {
   },
 
   beforeRouteUpdate(curr, prev, next) {
-    this.selected = -1;
+    this.selected = null;
     let {sid, qid} = curr.params;
     store.dispatch("loadExperiment").then(exp => {
       let question = exp.sections[sid - 1].doc.questions[qid - 1];
@@ -38,15 +41,17 @@ export default {
 
   created() {
     keyEvent.$on("digit", this.recordAndProceed);
+    keyEvent.$on("space", this.recordAndProceed);
   },
 
   beforeDestroy() {
     keyEvent.$off("digit", this.recordAndProceed);
+    keyEvent.$off("space", this.recordAndProceed);
   },
 
   data() {
     return {
-      selected: -1,
+      selected: null,
       askedAt: 0,
       statement: "",
       choices: [],
@@ -60,9 +65,12 @@ export default {
       this.statement = question.statement;
       this.choices = question.choices;
     },
+    giveupAndProceed() {
+      this.recordAndProceed(-1);
+    },
     recordAndProceed(choice) {
       const WAIT_MILLIS = 2000;
-      if (this.selected !== -1)
+      if (this.selected !== null || choice > this.choices.length)
         return;
 
       let answeredAt = Date.now();
@@ -112,6 +120,11 @@ export default {
         font-size: 20px;
       }
     }
+  }
+
+  .giveup {
+    margin: 40px auto;
+    text-align: center;
   }
 }
 </style>

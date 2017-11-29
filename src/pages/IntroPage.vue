@@ -18,7 +18,7 @@
               v-model="participant.department"
               :rules="departmentRules" required>
           </v-text-field>
-          <v-text-field label="연락처" :rules="contactRules" v-model="participant.contact"></v-text-field>
+          <v-text-field label="연락처 (이메일)" :rules="contactRules" v-model="participant.contact"></v-text-field>
         </v-form>
       </v-card-text>
       <v-card-actions>
