@@ -33,7 +33,7 @@ def record_answer(sec_idx, ans_idx):
     try:
         args = flask.request.get_json()
         choice = int(args["choice"])
-        rt = args["responseTime"]
+        rt = float(args["responseTime"])
     except KeyError:
         return flask.abort(401)
 
@@ -47,11 +47,20 @@ def logout():
     return "", 204
 
 
-@bp.route("/login")
-def authenticate_admin():
-    pass
+@bp.route("/result")
+def view_result():
+    id_filter = flask.request.args.get("filter")
+    experiments = flask.g.ctrl.get_all_experiments(id_filter)
+    return flask.render_template("result.html", experiments=experiments)
 
 
-@bp.route("/stats")
-def view_stats():
-    pass
+@bp.route("/result/csv")
+def download_result_csv():
+    exps = flask.g.ctrl.list_experiments_for_csv()
+    columns = ",".join(["experiment_id", "section_index", "document_id",
+                        "question_index", "choice", "correct", "response_time"])
+    csv = "\n".join([columns] + [",".join(item) for item in exps])
+    return flask.Response(
+      csv, mimetype="text/csv", headers={
+        "Content-Disposition": "attachment; filename=ExperimentResult.csv"
+      })

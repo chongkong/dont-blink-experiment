@@ -90,7 +90,7 @@ class Controller(object):
         patch = {
             f"answers/{ans_idx}/choice": choice,
             f"answers/{ans_idx}/correct": doc.questions[ans_idx].answer == choice,
-            f"answers/{ans_idx}/respone_time": response_time,
+            f"answers/{ans_idx}/response_time": response_time,
         }
         if ans_idx == len(doc.questions) - 1:
             patch["completed"] = True
@@ -98,12 +98,30 @@ class Controller(object):
 
         self.db.child(f"Experiments/{exp_id}/sections/{sec_idx}").update(patch)
 
-    def authenticate_admin(self, id, password):
-        pass
-
     @staticmethod
     def logout():
         flask.session.clear()
 
-    def view_stats(self):
-        pass
+    def get_all_experiments(self, id_filter=None):
+        resp = self.db.child("Experiments").get()
+        experiments = [model.Experiment.from_dict(exp)
+                       for exp_id, exp in resp.val().items()
+                       if id_filter is None or exp_id.startswith(id_filter)]
+        for exp in experiments:
+            exp.completed = all(sec.completed for sec in exp.sections)
+            exp.num_logs = sum([len(sec.answers) for sec in exp.sections])
+        return sorted(experiments, key=lambda e: e.started_at, reverse=True)
+
+    def list_experiments_for_csv(self, show_all=False):
+        experiments = self.get_all_experiments()
+        return [piece for exp in experiments
+                for piece in self._parse_experiment(exp)
+                if show_all or exp.completed]
+
+    @staticmethod
+    def _parse_experiment(exp):
+        for sec_idx, sec in enumerate(exp.sections):
+            for ans_idx, ans in enumerate(sec.answers):
+                yield (exp.id, str(sec_idx + 1), sec.doc_id, str(ans_idx + 1),
+                       str(ans.choice), str(ans.correct).lower(),
+                       str(ans.response_time))  # Typo compensation

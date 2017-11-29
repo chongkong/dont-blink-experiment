@@ -6,7 +6,7 @@ ID_TYPE = str
 
 def _create_dict_property(key):
     def key_get(self):
-        return self[key]
+        return self.get(key)
 
     def key_set(self, val):
         self[key] = val
@@ -84,6 +84,8 @@ class Answer(dict, metaclass=_DictModel):
 
     @classmethod
     def from_dict(cls, dic):
+        if "respone_time" in dic:
+            dic["response_time"] = dic.pop("respone_time")
         return cls(**dic)
 
 
