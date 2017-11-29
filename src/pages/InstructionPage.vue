@@ -1,7 +1,7 @@
 <template>
   <v-flex class="instruction-page" md6 offset-md3>
     <h1>Instructions</h1>
-    <p>실험자는 앞으로 지문을 읽고 지문에 관련된 문제에 답변하게 됩니다. 지문은 <em>평범하지 않은 형태M</em>로도 제공될 수 있으니 당황하지 마세요. 또한 지문을 읽는 과정에서 오디오가 재생되는 경우가 있으니 컴퓨터의 소리가 잘 들리는지 확인해주세요.</p>
+    <p>실험자는 앞으로 지문을 읽고 지문에 관련된 문제에 답변하게 됩니다. 지문은 <em>평범하지 않은 형태</em>로도 제공될 수 있으니 당황하지 마세요. 또한 지문을 읽는 과정에서 오디오가 재생되는 경우가 있으니 컴퓨터의 소리가 잘 들리는지 확인해주세요.</p>
     <div class="audio-wrapper">
       <audio src="//storage.googleapis.com/snu-dont-blink-experiment.appspot.com/data/p231_023.wav" controls></audio>
     </div>
@@ -44,7 +44,7 @@ export default {
 
 <style lang="scss">
 .instruction-page {
-  h1 {
+  h1, h2 {
     margin: 20px 0;
   }
 
