@@ -10,7 +10,7 @@
       </ul>
     </div>
     <div class="giveup">
-      <kbd :class="{'blue': selected === -1}"></kbd>모르겠어요 😢😢
+      <kbd :class="{'blue': selected === -1}">space</kbd>모르겠어요 😢😢
     </div>
   </v-flex>
 </template>
