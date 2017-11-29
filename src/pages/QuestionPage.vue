@@ -4,13 +4,13 @@
     <div class="ul-wrapper">
       <ul>
         <li v-for="(choice, i) in choices" :key="choice">
-          <kbd :class="{'blue': selected === i}">{{i + 1}}</kbd>
+          <kbd :class="{'blue': selected === (i + 1)}">{{i + 1}}</kbd>
           {{choice}}
         </li>
       </ul>
     </div>
     <div class="giveup">
-      <kbd :class="{'blue': selected === -1}">space</kbd>모르겠어요 😢😢
+      <span><kbd :class="{'blue': selected === -1}">space</kbd> 모르겠어요 😢😢</span>
     </div>
   </v-flex>
 </template>
@@ -41,12 +41,12 @@ export default {
 
   created() {
     keyEvent.$on("digit", this.recordAndProceed);
-    keyEvent.$on("space", this.recordAndProceed);
+    keyEvent.$on("space", this.giveupAndProceed);
   },
 
   beforeDestroy() {
     keyEvent.$off("digit", this.recordAndProceed);
-    keyEvent.$off("space", this.recordAndProceed);
+    keyEvent.$off("space", this.giveupAndProceed);
   },
 
   data() {
@@ -74,10 +74,11 @@ export default {
         return;
 
       let answeredAt = Date.now();
-      this.selected = choice - 1;
+      this.selected = choice;
       let responseTime = answeredAt - this.askedAt;
       let sid = this.$route.params.sid - 0;
       let qid = this.$route.params.qid - 0;
+      console.log(choice, responseTime);
       this.$store.dispatch("recordAnswer", {sid, qid, choice, responseTime}).then(() => {
         let timeLeft = Math.max(0, WAIT_MILLIS - (Date.now() - answeredAt));
         return util.waitForMillis(timeLeft);

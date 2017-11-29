@@ -12,8 +12,8 @@
 
   <div class="blink" v-else-if="displayMode === 'blink'">
     <transition-group name="blink">
-      <div class="blink-item" 
-           v-for="word in frame" 
+      <div class="blink-item"
+           v-for="word in frame"
            v-bind:key="word"
            v-html="word">
       </div>
@@ -84,7 +84,7 @@ export default {
       await util.waitForMillis(1000);
       this.proceed();
     },
-    
+
     async runBlink(frames) {
       for (let frame of frames) {
         this.frame.splice(0, this.frame.length);
@@ -115,15 +115,15 @@ export default {
       display: inline-block;
       font-size: 48px;
       padding-right: 0.3em;
-      transition: 180ms;
+      transition: 80ms;
 
       &.blink-enter-active {
-        transition-duration: 150ms;
+        transition-duration: 40ms;
         opacity: 0;
       }
       &.blink-leave-active {
+        transition-duration: 40ms;
         opacity: 0;
-        transform: translateX(-100px);
       }
     }
   }
