@@ -110,6 +110,9 @@ class Controller(object):
         for exp in experiments:
             exp.completed = all(sec.completed for sec in exp.sections)
             exp.num_logs = sum([len(sec.answers) for sec in exp.sections])
+            for sec in exp.sections:
+                if sec.audio_file is not None:
+                    sec.audio_file = sec.audio_file.split("/")[-1]
         return sorted(experiments, key=lambda e: e.started_at, reverse=True)
 
     def list_experiments_for_csv(self, show_all=False):
@@ -122,6 +125,6 @@ class Controller(object):
     def _parse_experiment(exp):
         for sec_idx, sec in enumerate(exp.sections):
             for ans_idx, ans in enumerate(sec.answers):
-                yield (exp.id, str(sec_idx + 1), sec.doc_id, str(ans_idx + 1),
-                       str(ans.choice), str(ans.correct).lower(),
-                       str(ans.response_time))  # Typo compensation
+                yield (exp.id, str(sec_idx + 1), sec.doc_id, sec.disp_type,
+                       sec.audio_file or "", str(ans_idx + 1), str(ans.choice),
+                       str(ans.correct).lower(), str(ans.response_time))

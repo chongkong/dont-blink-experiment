@@ -57,8 +57,8 @@ def view_result():
 @bp.route("/result/csv")
 def download_result_csv():
     exps = flask.g.ctrl.list_experiments_for_csv()
-    columns = ",".join(["experiment_id", "section_index", "document_id",
-                        "question_index", "choice", "correct", "response_time"])
+    columns = ",".join(["실험번호", "섹션", "문서", "표시", "오디오", "문항", "답안",
+                        "정답", "반응시간"])
     csv = "\n".join([columns] + [",".join(item) for item in exps])
     return flask.Response(
       csv, mimetype="text/csv", headers={

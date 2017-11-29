@@ -23,10 +23,12 @@
     <thead>
         <tr>
             <th>실험번호</th>
-            <th>섹션 순서</th>
-            <th>문서번호</th>
-            <th>문항번호</th>
-            <th>실험자 답안</th>
+            <th>섹션</th>
+            <th>문서</th>
+            <th>표시</th>
+            <th>오디오</th>
+            <th>문항</th>
+            <th>답안</th>
             <th>정답</th>
             <th>반응시간 (ms)</th>
         </tr>
@@ -43,6 +45,8 @@
             {% if loop.first -%}
             <td rowspan="{{ sec.answers | length }}">{{ outer_loop.index }}</td>
             <td rowspan="{{ sec.answers | length }}">{{ sec.doc_id }}</td>
+            <td rowspan="{{ sec.answers | length }}">{{ sec.disp_type }}</td>
+            <td rowspan="{{ sec.answers | length }}">{{ sec.audio_file or "" }}</td>
             {%- endif %}
             <td>{{ loop.index }}</td>
             <td>{{ ans.choice }}</td>
